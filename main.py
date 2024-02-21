@@ -2,14 +2,20 @@ import pygame
 from sprites import *
 from config import *
 import sys
-#video 11 börja
+import random
+#ändra så att scorefunktionen fungerar korrekt
 class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+        ##pygame.display.toggle_fullscreen()
         self.clock = pygame.time.Clock()
         self.running = True
         self.font = pygame.font.Font('projekt2/comici.ttf', 32)
+        self.score = 0
+
+        self.total_x_change = 0
+        self.total_y_change = 0
 
         self.character_spritesheet = Spritesheet('projekt2/img/character.png')
         self.terrain_spritesheet = Spritesheet('projekt2/img/terrain.png')
@@ -27,6 +33,40 @@ class Game:
                     Enemy(self, j, i)
                 if column == "P":
                     Player(self, j, i)
+                if column == "C":
+                    Coin(self, j, i)
+
+        
+
+    def coin_spawn(self):
+            i = 0
+            while i < 1:                
+                spawn_x = random.randint(1, 18) 
+                spawn_y = random.randint(1, 13) 
+                if tilemap[spawn_y][spawn_x] == ".":
+                    Coin(self, spawn_x , spawn_y)
+                    # ändra gamla coin pos till en punkt
+                    i += 1
+
+            self.enemy_spawn()
+    
+    def enemy_spawn(self):
+        if self.score % 10 == 0 and self.score != 0:
+            i = 0
+            while i < 1:                
+                spawn_x = random.randint(1, 18) 
+                spawn_y = random.randint(1, 13) 
+                if tilemap[spawn_y][spawn_x] == ".":
+                    Enemy(self, spawn_x , spawn_y)
+                    i += 1
+
+
+
+    
+    
+            
+       
+
 
     def new(self):
         # a new game starts
@@ -36,7 +76,9 @@ class Game:
         self.blocks = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
+        self.coins = pygame.sprite.LayeredUpdates()
         self.createTilemap()
+        self.score = 0
 
     def events(self):
         #game loop events
@@ -61,9 +103,16 @@ class Game:
             self.events()
             self.update()
             self.draw()
+           
+            
 
     def game_over(self):
         text = self.font.render("GAME OVER", True, RED)
+        score = self.font.render(str(self.score), True, WHITE)
+    
+        
+        score_rect = score.get_rect(center = (WIN_WIDTH/2, WIN_HEIGHT/2 + 50))
+
         text_rect = text.get_rect(center = (WIN_WIDTH/2, WIN_HEIGHT/2))
 
         restart_button = Button(10, WIN_HEIGHT - 60, 170, 50, WHITE, BLACK, 'RESTART', 32)
@@ -84,6 +133,7 @@ class Game:
 
             self.screen.blit(self.go_background, (0, 0))
             self.screen.blit(text, text_rect)
+            self.screen.blit(score, score_rect)
             self.screen.blit(restart_button.image, restart_button.rect)
             self.clock.tick(FPS)
             pygame.display.update()
