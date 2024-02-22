@@ -4,15 +4,18 @@ import math
 import random
 
 class Spritesheet:
+    # Class for handling sprite sheets and extracting sprites
     def __init__(self, file):
         self.sheet = pygame.image.load(file).convert()
 
+        # Extracts a sprite from the sprite sheet using specified coordinates and dimensions
     def get_sprite(self, x, y, width, height):
         sprite = pygame.Surface([width, height])
         sprite.blit(self.sheet, (0, 0), (x, y, width, height))
         sprite.set_colorkey(BLACK)
         return sprite
-
+    
+# Player class for handling player character
 class Player(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -20,7 +23,7 @@ class Player(pygame.sprite.Sprite):
         self.groups = self.game.all_sprites 
         pygame.sprite.Sprite.__init__(self, self.groups)
 
-    
+        # Initialize player attributes
         self.x = x = x * TILE_SIZE
         self.y = y = y * TILE_SIZE
         self.width = TILE_SIZE
@@ -32,15 +35,16 @@ class Player(pygame.sprite.Sprite):
         self.facing = 'down'
         self.animation_loop = 1
 
-
+        # Load default player image
         self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height)
-
+        
+        # Set player initial position
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
 
         
-
+        # Load player animation sequences for different directions
         self. down_animations =[self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height),
                           self.game.character_spritesheet.get_sprite(35, 2, self.width, self.height),
                           self.game.character_spritesheet.get_sprite(68, 2, self.width, self.height),]
@@ -57,14 +61,14 @@ class Player(pygame.sprite.Sprite):
                             self.game.character_spritesheet.get_sprite(35, 66, self.width, self.height),
                             self.game.character_spritesheet.get_sprite(68, 66, self.width, self.height),]
 
-    
+    # Update player state each frame
     def update (self):
-        
         self.movement()
         self.animate()
         self.collide_enemy()
         self.collide_coin()
 
+        # Move player and handle collisions
         self.rect.x += self.x_change
         self.collide_block('x')
         self.rect.y += self.y_change
@@ -72,7 +76,8 @@ class Player(pygame.sprite.Sprite):
 
         self.x_change = 0
         self.y_change = 0
-
+        
+        # Handle player movement based on key inputs
     def movement(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
@@ -90,19 +95,21 @@ class Player(pygame.sprite.Sprite):
 
             
     
+        # Check and handle collisions with enemies
     def collide_enemy(self):
         hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
         if hits:
             self.kill()
             self.game.playing = False
 
+        # Check and handle collisions with coins
     def collide_coin(self):
         hits = pygame.sprite.spritecollide(self, self.game.coins, True)
         if hits:
             self.game.score += 1
             self.game.coin_spawn()
 
-
+        # Check and handle collisions with blocks in specified direction
     def collide_block(self,direction):
         if direction == 'x':
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
@@ -118,9 +125,9 @@ class Player(pygame.sprite.Sprite):
                     self.rect.y = hits[0].rect.top - self.rect.height
                 if self.y_change < 0:
                     self.rect.y = hits[0].rect.bottom
+
+    # Update player animation based on movement and facing direction
     def animate(self):
-       
-        
         if self.facing == 'down':
             if self.y_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height)
@@ -157,7 +164,8 @@ class Player(pygame.sprite.Sprite):
                 if self.animation_loop >= 3:
                     self.animation_loop = 1
 
-class Enemy(pygame.sprite.Sprite):
+# Enemy class for handling enemy characters
+class Enemy(pygame.sprite.Sprite):  # Similar to the Player class
     def __init__(self, game, x, y):
         self.game = game
         self._layer = ENEMY_LAYER
@@ -213,7 +221,7 @@ class Enemy(pygame.sprite.Sprite):
         self.x_change  = 0
         self.y_change = 0
       
-    
+    # moves left and right randomly(speed is set in config.py)
     def movement(self):
         if self.facing == 'left':
             self.x_change -= ENEMY_SPEED
@@ -228,7 +236,6 @@ class Enemy(pygame.sprite.Sprite):
 
     def animate(self):
 
-        
         if self.facing == 'down':
             if self.y_change == 0:
                 self.image = self.game.enemy_spritesheet.get_sprite(3, 2, self.width, self.height)
@@ -264,8 +271,10 @@ class Enemy(pygame.sprite.Sprite):
                     self.animation_loop = 1
         
       
+        # Block class for handling block objects
 class Block(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y): # Similar to the Player class
+
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -286,8 +295,10 @@ class Block(pygame.sprite.Sprite):
 
         
 
+        # Ground class for handling ground objects
 class Ground(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y): # Similar to the Player class
+
         self.game = game
         self._layer = GROUND_LAYER
         self.groups = self.game.all_sprites
@@ -307,8 +318,10 @@ class Ground(pygame.sprite.Sprite):
 
         
 
+        # Coin class for handling coin objects
 class Coin(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y): # Similar to the Player class
+
         self.game = game
         self._layer = COIN_LAYER
         self.groups = self.game.all_sprites, self.game.coins
@@ -331,8 +344,10 @@ class Coin(pygame.sprite.Sprite):
 
 
 
+        # Class for creating interactive buttons and for handling the buttons        
 class Button:
     def __init__(self, x, y, width, height, fg, bg, content, fontsize):
+        # Initialize button attributes
         self.font = pygame.font.Font('projekt2/comici.ttf', fontsize)
         self.content = content
 
@@ -355,6 +370,7 @@ class Button:
         self.text_rect = self.text.get_rect(center=(self.width/2, self.height/2))
         self.image.blit(self.text, self.text_rect)
 
+        # Check if the button is pressed based on mouse position and click status
     def is_pressed(self, pos, pressed):
             if self.rect.collidepoint(pos):
                 if pressed[0]:
