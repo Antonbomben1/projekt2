@@ -51,9 +51,9 @@ class Game:
         if self.score % 10 == 0 and self.score != 0: #spawning an enemy every 10 points
             i = 0
             while i < 1: 
-                spawn_x = random.randint(2, 17) 
+                spawn_x = random.randint(2, 16) 
                 spawn_y = random.randint(1, 13) 
-                if tilemap[spawn_y][spawn_x] == "." and tilemap[spawn_y][spawn_x] != "P" and tilemap[spawn_y][spawn_x + 2] != "B" and tilemap[spawn_y][spawn_x - 2] != "B": # Check if there is a player or block within the 4 tiles he can move on on the tile
+                if tilemap[spawn_y][spawn_x] == "." and tilemap[spawn_y][spawn_x] != "P" and tilemap[spawn_y][spawn_x + 3] != "B" and tilemap[spawn_y][spawn_x - 3] != "B": # Check if there is a player or block within the 4 tiles he can move on on the tile
                     Enemy(self, spawn_x , spawn_y) # Spawn an enemy
                     i += 1
 
